@@ -47,7 +47,7 @@ func main() {
 				c.String("user"),
 				c.Args().Get(0),
 			)
-			ioutil.WriteFile(wdDir+"\\secureshell2moba.log", []byte(s), fs.ModePerm)
+			ioutil.WriteFile(wdDir+"\\start.log", []byte(s), fs.ModePerm)
 			config := &ssh.ClientConfig{
 				User:            c.String("user"),
 				Auth:            []ssh.AuthMethod{ssh.Password("SSH_PASSWORD_HERE")},
@@ -59,13 +59,10 @@ func main() {
 			}
 			defer conn.Close()
 			go func() {
-				logger := log.New(os.Stderr, "http2socks: ", log.LstdFlags|log.Lshortfile)
 				prxy := goproxy.NewProxyHttpServer()
 
 				r := &RemoteDialer{Conn: conn}
-
 				prxy.Tr = &http.Transport{Dial: r.Dial}
-				fmt.Println("Listen")
 				logger.Fatal(http.ListenAndServe("127.0.0.1:3080", prxy))
 			}()
 
